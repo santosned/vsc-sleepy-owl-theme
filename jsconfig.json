@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "CommonJS",
+    "moduleResolution": "Node",
+    "checkJs": false,
+    "baseUrl": ".",
+    "alwaysStrict": true,
+    "strict": true
+  },
+  "include": ["scripts/**/*"]
+}
