@@ -27,4 +27,22 @@ async function getThemeInfo(url) {
     }
 }
 
-module.exports = { getThemeInfo };
+async function readThemeSchema(url) {
+    try {
+        const getData = await fsPromises.readFile(url, 'utf-8');
+        return getData;
+    } catch (err) {
+        return Promise.reject(err);
+    }
+}
+
+async function writeThemeSchema(url, data) {
+    try {
+        const writeData = await fsPromises.writeFile(url, data);
+        return writeData;
+    } catch (err) {
+        return Promise.reject(err);
+    }
+}
+
+module.exports = { getThemeInfo, readThemeSchema, writeThemeSchema };
