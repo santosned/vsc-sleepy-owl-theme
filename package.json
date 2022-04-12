@@ -23,6 +23,7 @@
 	],
 	"contributors": [],
 	"devDependencies": {
+		"js-yaml": "^4.1.0",
 		"vsce": "^2.7.0"
 	},
 	"engines": {
