@@ -5,21 +5,22 @@ const { Transpiler } = require('./generate');
 
 getThemeInfo(process.env.npm_package_json)
     .then((themeInfo) => {
-        /*
-         * Create new theme transpiler @param 'tabWidth' - Define the indentantion tab
-         * width for the generated *-color-theme.json
+        /**
+         * Create new theme transpiler
+         * @param tabWidth Define the indentantion tab width for the generated json file.
          */
-        const transpiler = new Transpiler();
+        const transpiler = new Transpiler({ tabWidth });
 
-        /*
+        /**
          * Generate theme inside ./themes/
-         * @param 'object' - { label:string, src:string, dist:string } which dist and
-         * src are required options.
-         * @param 'callback' - Receives a callback function which return either an
-         * error or undefined when success.
+         * @param object { label?: <string>, src: <string>, dist: <string> }
+         * @param callback A callback function which return either an error or undefined when success.
          */
         transpiler.generate(themeInfo, (error) => {
-            console.log(error);
+            if (error) {
+                console.log(error);
+                process.exit(1);
+            }
         });
     })
     .catch((err) => {
