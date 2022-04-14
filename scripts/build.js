@@ -13,7 +13,7 @@ getThemeInfo(process.env.npm_package_json)
          * Create new theme transpiler
          * @param tabWidth Define the indentantion tab width for the generated json file.
          */
-        const transpiler = new Transpiler({ tabWidth });
+        const transpiler = new Transpiler({ tabWidth: 2 });
 
         /**
          * Generate theme inside ./themes/
