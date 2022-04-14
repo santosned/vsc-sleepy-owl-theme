@@ -4,11 +4,16 @@ const jsYaml = require('js-yaml');
 
 const { readThemeSchema, writeThemeSchema } = require('./utils/ThemeDevUtils');
 
+/**
+ * 
+ * @param {string} src Path to theme schema file
+ * @returns 
+ */
 async function getThemeSchema(src) {
     try {
         const yamlData = await readThemeSchema(src);
 
-        /*
+        /**
          * Parses yaml file into either a plain object, a string, a number, null or
          * undefined, or throws YAMLException on error.
          */
@@ -42,6 +47,11 @@ class Transpiler {
             return value;
         };
     }
+    /**
+     * 
+     * @param {object} options {dist: <string>, src: <string>}
+     * @param {function} callback
+     */
     generate(options, callback) {
         // Get the required dist and src paths from options
         const { dist, src } = { ...options };
@@ -55,7 +65,7 @@ class Transpiler {
         if (!dist.includes('-color-theme.json')) {
             throw `generate(): Invalid options 'dist: <string>'. Received '${dist}'.`;
         }
-        
+
         getThemeSchema(src)
             .then(async ([jsonData, yamlData]) => {
                 try {
@@ -66,7 +76,7 @@ class Transpiler {
                     );
 
                     const write = await writeThemeSchema(dist, jsonData);
-                    
+
                     callback(write);
                 } catch (err) {
                     console.log(err);
