@@ -45,16 +45,17 @@ class Transpiler {
     generate(options, callback) {
         // Get the required dist and src paths from options
         const { dist, src } = { ...options };
+
         // Throws error if src path does not contain .yml
-        if (src.contains('.yml')) {
+        if (!src.includes('.yml')) {
             throw `generate(): Invalid options 'src: <string>'. Received '${src}'.`;
         }
 
         // Throws error if dist path does not contain *-color-theme.json
-        if (dist.contains('-color-theme.json')) {
+        if (!dist.includes('-color-theme.json')) {
             throw `generate(): Invalid options 'dist: <string>'. Received '${dist}'.`;
         }
-
+        
         getThemeSchema(src)
             .then(async ([jsonData, yamlData]) => {
                 try {
@@ -65,6 +66,7 @@ class Transpiler {
                     );
 
                     const write = await writeThemeSchema(dist, jsonData);
+                    
                     callback(write);
                 } catch (err) {
                     console.log(err);
