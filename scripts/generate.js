@@ -10,6 +10,7 @@ const {
     readThemeSchema,
     writeThemeSchema,
     ColorsTool,
+    watchThemeChanges,
 } = require('./utils/ThemeDevUtils');
 
 /**
@@ -33,9 +34,6 @@ async function getThemeSchema(src, customType) {
 
         return Promise.all([jsonData, yamlData]);
     } catch (err) {
-        if (err && err.message) {
-            console.log(`${err.message}\n`);
-        }
         return Promise.reject(err);
     }
 }
@@ -112,13 +110,19 @@ class Transpiler {
 
                     callback(write);
                 } catch (err) {
-                    console.log(err);
                     callback(err);
                 }
             })
             .catch((err) => {
                 callback(err);
             });
+    }
+    listen(options, callback) {
+        const { src } = { ...options };
+
+        watchThemeChanges(src, () => {
+            this.generate(options, (v) => callback(v));
+        });
     }
 }
 
