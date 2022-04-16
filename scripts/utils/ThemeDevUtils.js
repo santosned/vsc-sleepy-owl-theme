@@ -4,6 +4,7 @@
 
 'use strict';
 
+const { watchFile } = require('fs');
 const fsPromises = require('fs/promises');
 const { join } = require('path');
 
@@ -67,6 +68,40 @@ async function writeThemeSchema(url, data) {
         return writeData;
     } catch (err) {
         return Promise.reject(err);
+    }
+}
+
+/**
+ * Watch for change in the theme file and call a callback function
+ * @param {string} url full path to theme file
+ * @param {function} callback
+ */
+async function watchThemeChanges(url, callback) {
+    try {
+        callback(); // Initialize the callback function
+        watchFile(
+            url,
+            {
+                // Specify the use of big integers
+                // in the Stats object
+                bigint: false,
+
+                // Specify if the process should
+                // continue as long as file is
+                // watched
+                persistent: true,
+
+                // Specify the interval between
+                // each poll the file
+                interval: 4000,
+            },
+            (curr, prev) => callback(curr, prev),
+        );
+    } catch (err) {
+        if (err && err.message) {
+            console.log(err);
+            process.exit(1);
+        }
     }
 }
 
@@ -219,4 +254,5 @@ module.exports = {
     readThemeSchema,
     writeThemeSchema,
     ColorsTool,
+    watchThemeChanges,
 };
