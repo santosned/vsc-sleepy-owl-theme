@@ -8,7 +8,7 @@ const https = require('https');
 const fsPromises = require('fs/promises');
 const { readFileSync } = require('fs');
 const { join } = require('path');
-const { log } = require('./ConsoleUtils');
+const { cbulk } = require('./ConsoleUtils');
 const perf = require('./Metricts');
 
 /**
@@ -159,9 +159,9 @@ class TestColorThemes {
         this.count = count;
         this.metricts = metricts;
     }
+
     async initialize() {
         const metricts = this.metricts;
-        metricts.now = perf.mark();
         const themesAvailiable = await getThemesDir();
 
         // Not themes found? return error.
@@ -172,95 +172,286 @@ class TestColorThemes {
             process.exit(1);
         }
 
-        log.perf(
-            'test',
-            `get list with themes at 'themes/' in`,
-            perf.runtime(metricts.now),
-        );
-
         /**
          *  Loop through each theme inside 'theme/' folder
          *  @returns List with all themes that passed the tests
          */
         const themes = themesAvailiable.filter((dir) => {
-            metricts.now = perf.mark();
+            // Get shortened path url used for logs.
+            const themePath = dir.slice(dir.lastIndexOf('themes'));
 
             // Read data from theme
             const fileData = readFileSync(dir, 'utf-8');
 
-            log.perf(
-                'test',
-                `Read ${dir.slice(dir.lastIndexOf('themes'))} in`,
-                perf.runtime(metricts.now),
-            );
-
-            metricts.now = perf.mark();
-
             // Create JSON Object
             const alt = JSON.parse(fileData);
 
-            log.perf(
-                'test',
-                `JSON parse theme data in`,
-                perf.runtime(metricts.now),
+            // Store tests results
+            const result = {
+                total: {
+                    invalid: 0,
+                },
+                keys: {
+                    name: {
+                        invalid: 0,
+                    },
+                },
+                type: {
+                    exist: false,
+                    value: {
+                        invalid: 0,
+                    },
+                },
+                colors: {
+                    exist: false,
+                    name: {
+                        invalid: 0,
+                    },
+                    value: {
+                        invalid: 0,
+                    },
+                },
+                tokenColors: {
+                    exist: false,
+                    value: {
+                        invalid: 0,
+                    },
+                    name: {
+                        not_found: 0,
+                    },
+                    scope: {
+                        not_found: 0,
+                    },
+                    settings: {
+                        fontStyle: {
+                            invalid: 0,
+                        },
+                        foreground: {
+                            invalid: 0,
+                        },
+                    },
+                },
+                step: {
+                    msg: (value, exist) => {
+                        if (value > 0 || exist === false) {
+                            return cbulk.red('FAIL');
+                        } else {
+                            return cbulk.green('PASS');
+                        }
+                    },
+                },
+            };
+
+            console.log(
+                `${cbulk.gray('[test]')} Target: ${cbulk.cyan(
+                    `${themePath}`,
+                )}...`,
             );
 
-            // Get all key names inside { colors }
-            const theme = Object.keys(alt.colors);
-
-            const result = {
-                pass: 0,
-                invalid: 0,
-                rate: 0,
-            };
+            console.log(`${cbulk.gray('[test]')}   # Object style:`);
 
             metricts.now = perf.mark();
 
-            theme.forEach((key) => {
-                if (this.reference.includes(key)) {
-                    result.pass = result.pass + 1;
+            Object.entries(alt).forEach(([key, value]) => {
+                const keynames = ['colors', 'tokenColors', 'type'];
+
+                if (!keynames.includes(key)) {
+                    result.keys.name.invalid += 1;
                 } else {
-                    result.invalid = result.invalid + 1;
+                    if (key === 'type') {
+                        result.type.exist = true;
+
+                        if (value.match(/^(dark|light)$/)) {
+                            result.type.value.invalid = 0;
+                        } else {
+                            result.type.value.invalid += 1;
+                            result.total.invalid += 1;
+                        }
+                    } else if (key === 'colors') {
+                        result.colors.exist = true;
+
+                        if (Object.keys(value).length > 0) {
+                            result.colors.value.invalid = 0;
+                        } else {
+                            result.colors.value.invalid += 1;
+                            result.total.invalid += 1;
+                        }
+                    } else if (key === 'tokenColors') {
+                        result.tokenColors.exist = true;
+
+                        if (Object.keys(value).length > 0) {
+                            result.tokenColors.value.invalid = 0;
+                        } else {
+                            result.tokenColors.value.invalid += 1;
+                            result.total.invalid += 1;
+                        }
+                    }
                 }
             });
 
-            log.perf(
-                'test',
-                `Check color-scheme tokens in`,
-                perf.runtime(metricts.now),
+            metricts.runtime = perf.runtime(metricts.now) + 'ms';
+
+            /**
+             * Check result, then log it.
+             */
+            console.log(
+                `${cbulk.gray('[test]')}    - Step [1/4]: ${result.step.msg(
+                    result.keys.name.invalid,
+                )} ${cbulk.gray(`(${metricts.runtime})`)}`,
+            );
+            console.log(
+                `${cbulk.gray('[test]')}    - Step [2/4]: ${result.step.msg(
+                    result.type.value.invalid,
+                    result.type.exist,
+                )} ${cbulk.gray(`(${metricts.runtime})`)}`,
+            );
+            console.log(
+                `${cbulk.gray('[test]')}    - Step [3/4]: ${result.step.msg(
+                    result.colors.value.invalid,
+                    result.colors.exist,
+                )} ${cbulk.gray(`(${metricts.runtime})`)}`,
+            );
+            console.log(
+                `${cbulk.gray('[test]')}    - Step [4/4]: ${result.step.msg(
+                    result.tokenColors.value.invalid,
+                    result.tokenColors.exist,
+                )} ${cbulk.gray(`(${metricts.runtime})`)}`,
             );
 
-            result.rate = (result.pass / this.count) * 100;
+            console.log(`${cbulk.gray('[test]')}   # Tokens:`);
 
-            log.testResult({
-                url: `${dir.slice(dir.lastIndexOf('themes'))}`,
-                total: theme.length,
-                invalid: result.invalid,
-                percent: result.rate.toFixed(2),
-                allTokens: this.count,
+            metricts.now = perf.mark();
+
+            /**
+             * TEST - colors:
+             */
+
+            Object.entries(alt.colors).forEach(([key, value]) => {
+                if (key) {
+                    // Check if keyname from theme is not inside color-theme reference
+                    if (!this.reference.includes(key)) {
+                        result.colors.name.invalid += 1;
+                        result.total.invalid += 1;
+                    } else {
+                        // Check if value is not following the HEX color format
+                        if (!value.match(/^#((\d|\w){6}|(\d|\w){8})$/)) {
+                            result.colors.value.invalid += 1;
+                            result.total.invalid += 1;
+                        }
+                    }
+                }
+                return value;
             });
 
-            return result.invalid > 0 ? false : true;
+            metricts.runtime = perf.runtime(metricts.now) + 'ms';
+
+            /**
+             * Check "colors" result, then log it.
+             */
+            console.log(
+                `${cbulk.gray('[test]')}    - Step [1/6]: ${result.step.msg(
+                    result.colors.name.invalid,
+                )} ${cbulk.gray(`(${metricts.runtime})`)}`,
+            );
+
+            console.log(
+                `${cbulk.gray('[test]')}    - Step [2/6]: ${result.step.msg(
+                    result.colors.value.invalid,
+                )} ${cbulk.gray(`(${metricts.runtime})`)}`,
+            );
+
+            metricts.now = perf.mark();
+
+            /**
+             * TEST - tokenColors:
+             */
+            if (!result.tokenColors.exist) {
+                result.tokenColors.settings.fontStyle.invalid += 1;
+                result.tokenColors.settings.foreground.invalid += 1;
+                result.total.invalid += 2;
+            } else {
+                Object.entries(alt.tokenColors).forEach(([key0, value0]) => {
+                    if (!Object.keys(value0).includes('name')) {
+                        result.tokenColors.name.not_found += 1;
+                        result.total.invalid += 1;
+                    } else if (!Object.keys(value0).includes('scope')) {
+                        result.tokenColors.scope.not_found += 1;
+                        result.total.invalid += 1;
+                    }
+
+                    Object.entries(value0).forEach(([key1, value1]) => {
+                        if (key1 === 'settings') {
+                            Object.entries(value1).forEach(([key2, value2]) => {
+                                // Tokens tests - Step [3/4] - Check fontStyle values
+                                if (key2 === 'fontStyle') {
+                                    const values = `\^italic|bold|underline|strikethrough|\s$\g`;
+                                    if (!value2.match(values) && value2 != '') {
+                                        result.tokenColors.settings.fontStyle.invalid += 1;
+                                        result.total.invalid += 1;
+                                    }
+                                } else if (key2 === 'foreground') {
+                                    // Tokens tests - Step [4/4] - Check foreground values
+                                    if (
+                                        !value2.match(
+                                            /^#((\d|\w){6}|(\d|\w){8})$/,
+                                        )
+                                    ) {
+                                        result.tokenColors.settings.foreground.invalid += 1;
+                                        result.total.invalid += 1;
+                                    }
+                                }
+                            });
+                        }
+                    });
+                });
+            }
+
+            metricts.runtime = perf.runtime(metricts.now) + 'ms';
+
+            /**
+             * Check result, then log it.
+             */
+            console.log(
+                `${cbulk.gray('[test]')}    - Step [3/6]: ${result.step.msg(
+                    result.tokenColors.name.not_found,
+                )} ${cbulk.gray(`(${metricts.runtime})`)}`,
+            );
+            console.log(
+                `${cbulk.gray('[test]')}    - Step [4/6]: ${result.step.msg(
+                    result.tokenColors.scope.not_found,
+                )} ${cbulk.gray(`(${metricts.runtime})`)}`,
+            );
+            console.log(
+                `${cbulk.gray('[test]')}    - Step [5/6]: ${result.step.msg(
+                    result.tokenColors.settings.fontStyle.invalid,
+                )} ${cbulk.gray(`(${metricts.runtime})`)}`,
+            );
+            console.log(
+                `${cbulk.gray('[test]')}    - Step [6/6]: ${result.step.msg(
+                    result.tokenColors.settings.foreground.invalid,
+                )} ${cbulk.gray(`(${metricts.runtime})`)}`,
+            );
+
+            if (result.total.invalid > 0) {
+                return false;
+            }
+            return true;
         });
 
-        log.finished(perf.runtime(metricts.start));
+        console.log(
+            `${cbulk.green(
+                `\nTest finished in ${perf.runtime(metricts.start)}ms\n`,
+            )}`,
+        );
 
         // If not all available themes passed the test return error
         if (themes.length !== themesAvailiable.length) {
-            console.log(
-                `Only ${(themes.length / themesAvailiable.length).toFixed(
-                    2,
-                )}% of ${
-                    themesAvailiable.length
-                } themes passed the test. Test failed.\n`,
-            );
+            console.log('Result:', 'Test failed.\n');
             process.exit(1);
         }
 
         // Else if all available themes passed the test:
-        console.log(
-            `No unknown or invalid tokens found. Test finished successfully.\n`,
-        );
+        console.log('Result:', 'Test finished successfully.\n');
         process.exit(0);
     }
 }
