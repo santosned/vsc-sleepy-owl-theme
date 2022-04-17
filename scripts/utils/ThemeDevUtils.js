@@ -2,7 +2,7 @@
  * Licensed under the MIT License.
  * See the LICENSE file in the project root for more information. */
 
-'use strict';
+'strict';
 
 const { watchFile } = require('fs');
 const fsPromises = require('fs/promises');
@@ -113,7 +113,7 @@ class ColorsTool {
         };
 
         this.alpha = valueIsIntenger(alpha); // Check if alpha channel should be adjusted
-        this.light = valueIsIntenger(light); // Check if light adjust should be used
+        this.light = valueIsIntenger(light); // Check if lightness should be adjusted
 
         // Remove any empty space from color value
         color = color.replace(/\s/g, '');

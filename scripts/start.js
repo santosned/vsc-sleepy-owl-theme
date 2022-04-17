@@ -4,11 +4,19 @@
 
 'strict';
 
-const { getThemeInfo, perfSense } = require('./utils/ThemeDevUtils');
+const { log } = require('./utils/ConsoleUtils');
+const perf = require('./utils/Metricts');
+
+const { getThemeInfo } = require('./utils/ThemeDevUtils');
 const { Transpiler } = require('./generate');
 
 getThemeInfo(process.env.npm_package_json)
     .then((themeInfo) => {
+        // Mark the start point for performance measures
+        themeInfo.metricts = {
+            start: perf.mark(),
+        };
+
         /**
          * Create new theme transpiler
          * @param tabWidth Define the indentantion tab width for the generated json file.
@@ -32,7 +40,7 @@ getThemeInfo(process.env.npm_package_json)
             }
 
             if (err === undefined) {
-                console.log(' Theme generated successfully!');
+                log.ready(perf.runtime(themeInfo.metricts.start));
             }
         });
     })

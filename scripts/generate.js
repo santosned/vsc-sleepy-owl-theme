@@ -6,6 +6,9 @@
 
 const jsYaml = require('js-yaml');
 
+const { log } = require('./utils/ConsoleUtils');
+const perf = require('./utils/Metricts');
+
 const {
     readThemeSchema,
     writeThemeSchema,
@@ -18,19 +21,36 @@ const {
  * @param {string} src Path to theme schema file
  * @returns
  */
-async function getThemeSchema(src, customType) {
+async function getThemeSchema(src, customType, metricts) {
     try {
+        metricts.now = perf.mark();
+
         const yamlData = await readThemeSchema(src);
+
+        log.perf(
+            'generate',
+            `Read ${src.slice(src.lastIndexOf('schemas'))} in`,
+            perf.runtime(metricts.now),
+        );
+
+        metricts.now = perf.mark();
+
         const CUSTOM_SCHEMA = jsYaml.DEFAULT_SCHEMA.extend(customType);
+
         /**
          * Parses yaml file into either a plain object, a string, a number, null or
          * undefined, or throws YAMLException on error.
          */
-
         let jsonData = await jsYaml.load(yamlData, {
             schema: CUSTOM_SCHEMA,
             json: true,
         });
+
+        log.perf(
+            'generate',
+            `Load theme data with js-yaml in`,
+            perf.runtime(metricts.now),
+        );
 
         return Promise.all([jsonData, yamlData]);
     } catch (err) {
@@ -40,8 +60,14 @@ async function getThemeSchema(src, customType) {
 
 class Transpiler {
     constructor(args) {
-        let { tabWidth } = { ...args };
-        this.tabWidth = typeof tabWidth === 'number' ? tabWidth : 2;
+        const { tabWidth } = { ...args };
+
+        if (!tabWidth || typeof tabWidth !== 'number') {
+            tabWidth = 2;
+        }
+
+        this.tabWidth = tabWidth;
+
         this.replacer = (key, value) => {
             // Key names that should be exclude from the theme file *.json
             const blackList = ['name', 'author', 'version', 'base'];
@@ -78,6 +104,7 @@ class Transpiler {
             },
         });
     }
+
     /**
      *
      * @param {object} options {dist: <string>, src: <string>}
@@ -85,7 +112,7 @@ class Transpiler {
      */
     generate(options, callback) {
         // Get the required dist and src paths from options
-        const { dist, src } = { ...options };
+        const { dist, src, metricts } = { ...options };
 
         // Throws error if src path does not contain .yml
         if (!src.includes('.yml')) {
@@ -97,9 +124,11 @@ class Transpiler {
             throw `generate(): Invalid options 'dist: <string>'. Received '${dist}'.`;
         }
 
-        getThemeSchema(src, this.jsYaml_ct_cast)
+        getThemeSchema(src, this.jsYaml_ct_cast, metricts)
             .then(async ([jsonData, yamlData]) => {
                 try {
+                    metricts.now = perf.mark();
+
                     jsonData = await JSON.stringify(
                         jsonData,
                         this.replacer,
@@ -108,19 +137,31 @@ class Transpiler {
 
                     const write = await writeThemeSchema(dist, jsonData);
 
-                    callback(write);
+                    log.perf(
+                        'generate',
+                        `theme saved at ${dist.slice(
+                            dist.lastIndexOf('themes'),
+                        )} in`,
+                        perf.runtime(metricts.now),
+                    );
+
+                    return callback(write);
                 } catch (err) {
-                    callback(err);
+                    return callback(err);
                 }
             })
             .catch((err) => {
-                callback(err);
+                return callback(err);
             });
+        return;
     }
+
     listen(options, callback) {
         const { src } = { ...options };
 
         watchThemeChanges(src, () => {
+            log.listen(options);
+            options.metricts.start = perf.mark();
             this.generate(options, (v) => callback(v));
         });
     }
