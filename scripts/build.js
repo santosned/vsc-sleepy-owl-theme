@@ -14,8 +14,6 @@ getThemeInfo(process.env.npm_package_json)
     .then((themeInfo) => {
         log.build(themeInfo);
 
-        // process.env.VSCODE_THEME_DEV_METRICTS = '';
-
         themeInfo.metricts = {
             start: perf.mark(),
             now: perf.mark(),
