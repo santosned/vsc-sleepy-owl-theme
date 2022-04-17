@@ -8,6 +8,8 @@ const https = require('https');
 const fsPromises = require('fs/promises');
 const { readFileSync } = require('fs');
 const { join } = require('path');
+const { log } = require('./ConsoleUtils');
+const perf = require('./Metricts');
 
 /**
  *
@@ -152,11 +154,14 @@ class ColorThemeReference {
 }
 
 class TestColorThemes {
-    constructor({ colors, count }) {
+    constructor({ colors, count, metricts }) {
         this.reference = colors;
         this.count = count;
+        this.metricts = metricts;
     }
     async initialize() {
+        const metricts = this.metricts;
+        metricts.now = perf.mark();
         const themesAvailiable = await getThemesDir();
 
         // Not themes found? return error.
@@ -167,20 +172,38 @@ class TestColorThemes {
             process.exit(1);
         }
 
-        console.log('Initialize themes colors tokens test...');
+        log.perf(
+            'test',
+            `get list with themes at 'themes/' in`,
+            perf.runtime(metricts.now),
+        );
 
         /**
          *  Loop through each theme inside 'theme/' folder
          *  @returns List with all themes that passed the tests
          */
         const themes = themesAvailiable.filter((dir) => {
-            console.log(`\n @ ${dir.slice(dir.lastIndexOf('themes'))}\n`);
+            metricts.now = perf.mark();
 
             // Read data from theme
             const fileData = readFileSync(dir, 'utf-8');
 
+            log.perf(
+                'test',
+                `Read ${dir.slice(dir.lastIndexOf('themes'))} in`,
+                perf.runtime(metricts.now),
+            );
+
+            metricts.now = perf.mark();
+
             // Create JSON Object
             const alt = JSON.parse(fileData);
+
+            log.perf(
+                'test',
+                `JSON parse theme data in`,
+                perf.runtime(metricts.now),
+            );
 
             // Get all key names inside { colors }
             const theme = Object.keys(alt.colors);
@@ -191,6 +214,8 @@ class TestColorThemes {
                 rate: 0,
             };
 
+            metricts.now = perf.mark();
+
             theme.forEach((key) => {
                 if (this.reference.includes(key)) {
                     result.pass = result.pass + 1;
@@ -199,20 +224,26 @@ class TestColorThemes {
                 }
             });
 
+            log.perf(
+                'test',
+                `Check color-scheme tokens in`,
+                perf.runtime(metricts.now),
+            );
+
             result.rate = (result.pass / this.count) * 100;
 
-            console.log(`  - Total: ${theme.length} tokens.`);
-            console.log(`  - Invalid: ${result.invalid} tokens.`);
-            console.log(
-                `  - Utilized: ${result.rate.toFixed(2)}% of ${
-                    this.count
-                } tokens available in the color-theme references.`,
-            );
+            log.testResult({
+                url: `${dir.slice(dir.lastIndexOf('themes'))}`,
+                total: theme.length,
+                invalid: result.invalid,
+                percent: result.rate.toFixed(2),
+                allTokens: this.count,
+            });
 
             return result.invalid > 0 ? false : true;
         });
 
-        console.log('\nFinished.\n');
+        log.finished(perf.runtime(metricts.start));
 
         // If not all available themes passed the test return error
         if (themes.length !== themesAvailiable.length) {
