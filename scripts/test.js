@@ -4,7 +4,7 @@
 
 'strict';
 
-const { log } = require('./utils/ConsoleUtils');
+const { cbulk } = require('./utils/ConsoleUtils');
 const perf = require('./utils/Metricts');
 
 const {
@@ -23,7 +23,7 @@ const colorThemeReference = new ColorThemeReference();
  * Only set { latest: false } to true if cached data is outdated otherwise keep it false.
  */
 colorThemeReference.get({ latest: false }).then((data) => {
-    log.test({ label: 'Test initialized...' });
+    console.log(`${cbulk.green('Test initialized...\n')}`);
 
     const colorsReference = data.colors;
     const colorsAvailable = data.colors.length;
