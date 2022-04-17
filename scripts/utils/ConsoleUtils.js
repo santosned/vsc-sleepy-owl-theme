@@ -12,6 +12,7 @@ function formatThemesUrl(src, dist) {
 
 const cbulk = {
     green: (v) => `\x1b[32m${v}\x1b[0m`,
+    orange: (v) => `\x1b[33m${v}\x1b[0m`,
     cyan: (v) => `\x1b[36m${v}\x1b[0m`,
     gray: (v) => `\x1b[90m${v}\x1b[0m`,
     red: (v) => `\x1b[91m${v}\x1b[0m`,
@@ -21,31 +22,6 @@ const cbulk = {
 };
 
 const log = {
-    test: (args) => {
-        console.log(`${cbulk.yellow(args.label)}`);
-        console.log();
-    },
-    testResult: (args) => {
-        const { url, total, invalid, percent, allTokens } = { ...args };
-        console.log();
-        console.log(
-            `${cbulk.green('Color theme')} ${cbulk.cyan(url)} ${cbulk.green(
-                'tokens test result:',
-            )}`,
-        );
-        console.log();
-        if (invalid > 0) {
-            console.log(
-                `   ${cbulk.white(`> Invalid:`)}     ${cbulk.red(invalid)}`,
-            );
-        }
-        console.log(
-            `   ${cbulk.white('> Total:')}    ${cbulk.cyan(
-                `${total} of ${allTokens} tokens used`,
-            )}`,
-        );
-        console.log();
-    },
     listen: (args) => {
         const { src, dist } = formatThemesUrl(args.src, args.dist);
         console.clear();
@@ -73,6 +49,7 @@ const log = {
         console.log();
     },
     finished: (time) => {
+        console.log();
         console.log(`${cbulk.green(`Finished in ${time}ms`)}`);
         console.log();
     },
