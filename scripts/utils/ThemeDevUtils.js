@@ -108,8 +108,9 @@ async function watchThemeChanges(url, callback) {
 class ColorsTool {
     constructor(color, alpha, light) {
         const valueIsIntenger = (value) => {
-            if (typeof value === 'number') return value;
-            return false;
+            if (value > 0) return value;
+            else if (value == '0' || value == '00') return 0;
+            else return false;
         };
 
         this.alpha = valueIsIntenger(alpha); // Check if alpha channel should be adjusted
@@ -146,7 +147,7 @@ class ColorsTool {
         // Handle extra options after checking color value
         if (colorValue !== null) {
             if (this.light !== false) {
-                colorValue = lightAdjust(colorValue, this.light);
+                colorValue = this.lightAdjust(colorValue, this.light);
             }
         }
 
@@ -162,13 +163,13 @@ class ColorsTool {
         if (hex.length === 9) {
             // If so return it replaced with alpha channel percentage
             hex = hex.replace(/[aA0-zZ9]{2}$/g, '');
-            return hex + this.percentToHex(percentage);
+            return `${hex}${this.percentToHex(percentage)}`;
         }
 
         // Check if HEX does not has alpha channel.
         if (hex.length === 7) {
             // If so return it with alpha channel percentage
-            return hex + this.percentToHex(percentage);
+            return `${hex}${this.percentToHex(percentage)}`;
         }
     }
 
@@ -181,7 +182,7 @@ class ColorsTool {
             return this.rgbToHex(rgb); // Return hex color without alpha channel.
         }
         // Return HEX color with alpha channel
-        return this.rgbToHex(rgb) + this.percentToHex(percentage);
+        return `${this.rgbToHex(rgb)}${this.percentToHex(percentage)}`;
     }
 
     // Handle if color value follows the RGBA format
@@ -194,7 +195,7 @@ class ColorsTool {
         // Remove RGB alpha channel and get RGB values into a list
         const rgb = rgba.replace(/^rgba\(|\,(.){1,3}\)$/g, '').split(',');
         // Return HEX color with alpha channel
-        return this.rgbToHex(rgb) + this.percentToHex(percentage);
+        return `${this.rgbToHex(rgb)}${this.percentToHex(percentage)}`;
     }
 
     // Adjust hex color lightness
@@ -218,6 +219,7 @@ class ColorsTool {
 
     // Convert alpha channel percentage into HEX
     percentToHex(alpha) {
+        if (alpha === 0) return '00';
         alpha = parseInt((alpha * 255) / 100).toString(16);
         alpha = alpha.padStart(2, '0');
         return alpha;
