@@ -6,7 +6,7 @@
 
 const jsYaml = require('js-yaml');
 
-const { log } = require('./utils/ConsoleUtils');
+const { log, cbulk } = require('./utils/ConsoleUtils');
 const perf = require('./utils/Metricts');
 
 const {
@@ -70,7 +70,7 @@ class Transpiler {
 
         this.replacer = (key, value) => {
             // Key names that should be exclude from the theme file *.json
-            const blackList = ['name', 'author', 'version', 'base'];
+            const blackList = ['id', 'author', 'version', 'base'];
 
             // Exclude json entry if key is in the blacklist
             if (blackList.includes(key)) {
@@ -84,19 +84,64 @@ class Transpiler {
 
             return value;
         };
-
         this.jsYaml_ct_cast = new jsYaml.Type('!cast', {
             kind: 'mapping',
             resolve: (args) => {
-                return args || {};
+                const { color, alpha, light } = { ...args };
+
+                // Test 'color' option, if isn't a string log an error instead of continue
+                // casting.
+                if (typeof color != 'string') {
+                    console.log(
+                        `${cbulk.gray('[generate]')} ${cbulk.red(
+                            `error: Option 'color' requires a string as value, but received '${typeof color}' value.`,
+                        )}`,
+                    );
+                    return null;
+                }
+
+                // Test 'alpha' option (if exist), in case it isn't a number log an error
+                // instead of continue casting.
+                if (alpha && typeof alpha != 'number') {
+                    console.log(
+                        `${cbulk.gray('[generate]')} ${cbulk.red(
+                            `error: Option 'alpha' requires a number as value, but received a ${typeof alpha} as value.`,
+                        )}`,
+                    );
+                    return null;
+                }
+
+                // Test 'light' option (if exist), in case it isn't a number log an error
+                // instead of continue casting.
+                if (light && typeof light != 'number') {
+                    console.log(
+                        `${cbulk.gray('[generate]')} ${cbulk.red(
+                            `error: Option 'light' requires a number as value, but received a ${typeof light} as value.`,
+                        )}`,
+                    );
+                    return null;
+                }
+
+                return { color, alpha, light };
             },
             construct: (args) => {
-                if (!args.color) return null;
-                const colorsTool = new ColorsTool(
-                    args.color || false,
-                    args.alpha || false,
-                    args.light || false,
-                );
+                const { color, alpha, light } = { ...args };
+                if (!color || color == '') return null;
+
+                if (
+                    color.match(/^#((\d|\w){6}|(\d|\w){8})$/) &&
+                    typeof alpha != 'number' &&
+                    typeof light != 'number'
+                ) {
+                    console.log(
+                        `${cbulk.gray('[generate]')} ${cbulk.orange(
+                            `warning: It's not recommended to use '!cast' with only a hex color. Either adjust the color to rgb, or remove the !cast. Skipping...`,
+                        )}`,
+                    );
+                    return null;
+                }
+
+                const colorsTool = new ColorsTool(color, alpha, light);
                 return colorsTool.cast();
             },
             represent: (args) => {
