@@ -108,9 +108,10 @@ async function watchThemeChanges(url, callback) {
 class ColorsTool {
     constructor(color, alpha, light) {
         const valueIsIntenger = (value) => {
-            if (value > 0) return value;
-            else if (value == '0' || value == '00') return 0;
-            else return false;
+            if (!value && typeof value != 'number') {
+                return false;
+            }
+            return value;
         };
 
         this.alpha = valueIsIntenger(alpha); // Check if alpha channel should be adjusted
@@ -137,11 +138,11 @@ class ColorsTool {
         let colorValue = null;
 
         if (this.matchHex) {
-            colorValue = this.isHex(this.color, this.alpha);
+            colorValue = this.handleHexColor(this.color, this.alpha);
         } else if (this.machRgb) {
-            colorValue = this.isRgb(this.color, this.alpha);
+            colorValue = this.handleRgbColor(this.color, this.alpha);
         } else if (this.matchRgba) {
-            colorValue = this.isRgba(this.color, this.alpha);
+            colorValue = this.handleRgbaColor(this.color, this.alpha);
         }
 
         // Handle extra options after checking color value
@@ -155,52 +156,66 @@ class ColorsTool {
     }
 
     // Handle if color value follows the HEX format
-    isHex(hex, percentage) {
+    handleHexColor(hex, percentage) {
         // Return color if no alpha channel was passed.
         if (percentage === false) return hex;
 
         // Check if HEX color has alpha channel already.
         if (hex.length === 9) {
-            // If so return it replaced with alpha channel percentage
+            // Remove old alpha channel
             hex = hex.replace(/[aA0-zZ9]{2}$/g, '');
-            return `${hex}${this.percentToHex(percentage)}`;
-        }
 
-        // Check if HEX does not has alpha channel.
-        if (hex.length === 7) {
-            // If so return it with alpha channel percentage
-            return `${hex}${this.percentToHex(percentage)}`;
+            // Add new alpha channel
+            hex = `${hex}${this.percentToHex(percentage)}`;
+
+            return hex;
+        } else if (hex.length === 7) {
+            // Add new alpha channel percentage
+            hex = `${hex}${this.percentToHex(percentage)}`;
+
+            return hex;
         }
     }
 
     // Handle if color value follows the RGB format
-    isRgb(rgb, percentage) {
+    handleRgbColor(rgb, percentage) {
+        let hex = '';
+
         // Get RGB values into a list
         rgb = rgb.replace(/rgb\(|\)/g, '').split(',');
 
         if (percentage === false) {
-            return this.rgbToHex(rgb); // Return hex color without alpha channel.
+            hex = this.rgbToHex(rgb); // Get hex color without alpha channel.
+            return hex;
         }
-        // Return HEX color with alpha channel
-        return `${this.rgbToHex(rgb)}${this.percentToHex(percentage)}`;
+
+        // HEX color with alpha channel
+        hex = `${this.rgbToHex(rgb)}${this.percentToHex(percentage)}`;
+        return hex;
     }
 
     // Handle if color value follows the RGBA format
-    isRgba(rgba, percentage) {
+    handleRgbaColor(rgba, percentage) {
+        let hex = '';
+
         if (percentage === false) {
             // Get RGBA values into a list
             rgba = rgba.replace(/rgba\(|\)/g, '').split(',');
-            return this.rgbaToHex(rgba); // Return HEX color without alpha channel.
+            hex = this.rgbaToHex(rgba); // Return HEX color without alpha channel.
+            return hex;
         }
+
         // Remove RGB alpha channel and get RGB values into a list
         const rgb = rgba.replace(/^rgba\(|\,(.){1,3}\)$/g, '').split(',');
-        // Return HEX color with alpha channel
-        return `${this.rgbToHex(rgb)}${this.percentToHex(percentage)}`;
+
+        // HEX color with alpha channel
+        hex = `${this.rgbToHex(rgb)}${this.percentToHex(percentage)}`;
+        return hex;
     }
 
     // Adjust hex color lightness
     lightAdjust(hex, amount) {
-        let alpha = hex.length === 9 ? hex.slice(7, 9) : '';
+        const alpha = hex.length === 9 ? hex.slice(7, 9) : '';
 
         let r = hex.slice(1, 3);
         let g = hex.slice(3, 5);
@@ -214,15 +229,19 @@ class ColorsTool {
         g = Math.min(255, Math.max(0, g)).toString(16).padStart(2, '0');
         b = Math.min(255, Math.max(0, b)).toString(16).padStart(2, '0');
 
-        return '#' + r + g + b + alpha;
+        return `#${r}${g}${b}${alpha}`.toUpperCase();
     }
 
     // Convert alpha channel percentage into HEX
     percentToHex(alpha) {
-        if (alpha === 0) return '00';
+        if (!alpha && typeof alpha != 'number') {
+            return '';
+        }
+        if (alpha < 1) return '00';
+
         alpha = parseInt((alpha * 255) / 100).toString(16);
         alpha = alpha.padStart(2, '0');
-        return alpha;
+        return alpha.toUpperCase();
     }
 
     // Convert RGB color into HEX color
@@ -232,22 +251,21 @@ class ColorsTool {
             return parseInt(color).toString(16).padStart(2, '0');
         });
 
-        return '#' + hexColor.join('');
+        return `#${hexColor.join('')}`.toUpperCase();
     }
 
     // Convert RGBA color into HEX color
     rgbaToHex(rgba) {
         // Get rgb(a) values into one array of strings
         const hexColor = rgba.map((color, index) => {
-            if (index === 3) {
-                // rgba(0, 1, 2, [3])
+            if (index === 3) { // rgba(0, 1, 2, [3])
                 const alpha = parseFloat(color);
                 return percentToHex(alpha > 1.0 ? 100 : alpha * 100);
             }
             return parseInt(color).toString(16).padStart(2, '0');
         });
 
-        return '#' + hexColor.join('');
+        return `#${hexColor.join('')}`.toUpperCase();
     }
 }
 
