@@ -4,32 +4,15 @@
 
 'strict';
 
-const { log } = require('./utils/ConsoleUtils');
-const perf = require('./utils/Metricts');
+const transpiler = require('./generate');
+const { log } = require('./lib/console');
+const { metadata } = require('./lib/snippet');
 
-const { getThemeInfo } = require('./utils/ThemeDevUtils');
-const { Transpiler } = require('./generate');
-
-getThemeInfo(process.env.npm_package_json)
+metadata
+    .getThemeInfo(process.env.npm_package_json)
     .then((themeInfo) => {
-        log.build(themeInfo);
+        log.build.init(themeInfo);
 
-        themeInfo.metricts = {
-            start: perf.mark(),
-            now: perf.mark(),
-        };
-
-        /**
-         * Create new theme transpiler
-         * @param tabWidth Define the indentantion tab width for the generated json file.
-         */
-        const transpiler = new Transpiler({ tabWidth: 2 });
-
-        /**
-         * Generate theme inside ./themes/
-         * @param object { label?: <string>, src: <string>, dist: <string> }
-         * @param callback A callback function which return either an error or undefined when success.
-         */
         transpiler.generate(themeInfo, (err) => {
             // This will be called every time a error occurs
             if (err) {
@@ -39,7 +22,7 @@ getThemeInfo(process.env.npm_package_json)
             }
 
             if (err === undefined) {
-                log.ready(perf.runtime(themeInfo.metricts.start));
+                log.build.ready();
                 process.exit(0);
             }
         });
