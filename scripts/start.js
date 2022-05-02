@@ -4,33 +4,14 @@
 
 'strict';
 
-const { log } = require('./utils/ConsoleUtils');
-const perf = require('./utils/Metricts');
+const transpiler = require('./generate');
+const { log } = require('./lib/console');
+const { metadata } = require('./lib/snippet');
 
-const { getThemeInfo } = require('./utils/ThemeDevUtils');
-const { Transpiler } = require('./generate');
-
-getThemeInfo(process.env.npm_package_json)
+metadata
+    .getThemeInfo(process.env.npm_package_json)
     .then((themeInfo) => {
-        // Mark the start point for performance measures
-        themeInfo.metricts = {
-            start: perf.mark(),
-        };
-
-        /**
-         * Create new theme transpiler
-         * @param tabWidth Define the indentantion tab width for the generated json file.
-         */
-        const transpiler = new Transpiler({ tabWidth: 2 });
-
-        /**
-         * Listen for changes in the theme file inside './themes/schemas/' and automatically
-         * generate a new *-color-theme.json file.
-         * @param object { label?: <string>, src: <string>, dist: <string> }
-         * @param callback A callback function which return either an error or undefined when success.
-         */
         transpiler.listen(themeInfo, (err) => {
-            // This will be called every time a error occurs
             if (err) {
                 // Log the error message if any
                 if (err.message) console.log(err.message);
@@ -40,7 +21,7 @@ getThemeInfo(process.env.npm_package_json)
             }
 
             if (err === undefined) {
-                log.ready(perf.runtime(themeInfo.metricts.start));
+                log.listen.ready();
             }
         });
     })
