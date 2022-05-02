@@ -5,189 +5,52 @@
 'strict';
 
 const jsYaml = require('js-yaml');
-
-const { log, cbulk } = require('./utils/ConsoleUtils');
-const perf = require('./utils/Metricts');
-
-const {
-    readThemeSchema,
-    writeThemeSchema,
-    ColorsTool,
-    watchThemeChanges,
-} = require('./utils/ThemeDevUtils');
-
-/**
- *
- * @param {string} src Path to theme schema file
- * @returns
- */
-async function getThemeSchema(src, customType, metricts) {
-    try {
-        metricts.now = perf.mark();
-
-        const yamlData = await readThemeSchema(src);
-
-        log.perf(
-            'generate',
-            `Read ${src.slice(src.lastIndexOf('schemas'))} in`,
-            perf.runtime(metricts.now),
-        );
-
-        metricts.now = perf.mark();
-
-        const CUSTOM_SCHEMA = jsYaml.DEFAULT_SCHEMA.extend(customType);
-
-        /**
-         * Parses yaml file into either a plain object, a string, a number, null or
-         * undefined, or throws YAMLException on error.
-         */
-        let jsonData = await jsYaml.load(yamlData, {
-            schema: CUSTOM_SCHEMA,
-            json: true,
-        });
-
-        log.perf(
-            'generate',
-            `Load theme data with js-yaml in`,
-            perf.runtime(metricts.now),
-        );
-
-        return Promise.all([jsonData, yamlData]);
-    } catch (err) {
-        return Promise.reject(err);
-    }
-}
+const cast = require('./lib/cast');
+const { log } = require('./lib/console');
+const { themeFiles } = require('./lib/snippet');
 
 class Transpiler {
-    constructor(args) {
-        const { tabWidth } = { ...args };
-
-        if (!tabWidth || typeof tabWidth !== 'number') {
-            tabWidth = 2;
-        }
-
-        this.tabWidth = tabWidth;
-
+    constructor() {
+        this.tabWidth = 2;
         this.replacer = (key, value) => {
             // Key names that should be exclude from the theme file *.json
-            const blackList = ['id', 'author', 'version', 'base'];
+            const blackList = ['id', 'author', 'version', 'base', 'status'];
 
             // Exclude json entry if key is in the blacklist
-            if (blackList.includes(key)) {
-                return undefined;
-            }
+            if (blackList.includes(key)) return undefined;
 
             // Exclude json entry if value is null or empty string
             if (value === null || !value) {
-                return undefined;
+                const excludeList = ['fontStyle'];
+                if (!excludeList.includes(key)) return undefined;
+                return '';
             }
 
             return value;
         };
-        this.jsYaml_ct_cast = new jsYaml.Type('!cast', {
-            kind: 'mapping',
-            resolve: (args) => {
-                const { color, alpha, light } = { ...args };
-
-                // Test 'color' option, if isn't a string log an error instead of continue
-                // casting.
-                if (typeof color != 'string') {
-                    console.log(
-                        `${cbulk.gray('[generate]')} ${cbulk.red(
-                            `error: Option 'color' requires a string as value, but received '${typeof color}' value.`,
-                        )}`,
-                    );
-                    return null;
-                }
-
-                // Test 'alpha' option (if exist), in case it isn't a number log an error
-                // instead of continue casting.
-                if (alpha && typeof alpha != 'number') {
-                    console.log(
-                        `${cbulk.gray('[generate]')} ${cbulk.red(
-                            `error: Option 'alpha' requires a number as value, but received a ${typeof alpha} as value.`,
-                        )}`,
-                    );
-                    return null;
-                }
-
-                // Test 'light' option (if exist), in case it isn't a number log an error
-                // instead of continue casting.
-                if (light && typeof light != 'number') {
-                    console.log(
-                        `${cbulk.gray('[generate]')} ${cbulk.red(
-                            `error: Option 'light' requires a number as value, but received a ${typeof light} as value.`,
-                        )}`,
-                    );
-                    return null;
-                }
-
-                return { color, alpha, light };
-            },
-            construct: (args) => {
-                const { color, alpha, light } = { ...args };
-                if (!color || color == '') return null;
-
-                if (
-                    color.match(/^#((\d|\w){6}|(\d|\w){8})$/) &&
-                    typeof alpha != 'number' &&
-                    typeof light != 'number'
-                ) {
-                    console.log(
-                        `${cbulk.gray('[generate]')} ${cbulk.orange(
-                            `warning: It's not recommended to use '!cast' with only a hex color. Either adjust the color to rgb, or remove the !cast. Skipping...`,
-                        )}`,
-                    );
-                    return null;
-                }
-
-                const colorsTool = new ColorsTool(color, alpha, light);
-                return colorsTool.cast();
-            },
-            represent: (args) => {
-                return args;
-            },
-        });
     }
 
     /**
+     * Generate the `*-color-theme.json` file inside `/themes` folder based on the theme schema inside `/themes/schemas` folder.
      *
-     * @param {object} options {dist: <string>, src: <string>}
-     * @param {function} callback
+     * @param {object} options The theme metadata such as `dist` and `src` path locations.
+     * @param {function} callback The function called either when an error occurs or when execution finished successfully.
      */
     generate(options, callback) {
-        // Get the required dist and src paths from options
-        const { dist, src, metricts } = { ...options };
+        const { dist, src } = { ...options };
 
-        // Throws error if src path does not contain .yml
-        if (!src.includes('.yml')) {
-            throw `generate(): Invalid options 'src: <string>'. Received '${src}'.`;
-        }
-
-        // Throws error if dist path does not contain *-color-theme.json
-        if (!dist.includes('-color-theme.json')) {
-            throw `generate(): Invalid options 'dist: <string>'. Received '${dist}'.`;
-        }
-
-        getThemeSchema(src, this.jsYaml_ct_cast, metricts)
-            .then(async ([jsonData, yamlData]) => {
+        getThemeSchema(src)
+            .then(async (jsonData) => {
                 try {
-                    metricts.now = perf.mark();
-
-                    jsonData = await JSON.stringify(
+                    this.themeData = JSON.stringify(
                         jsonData,
                         this.replacer,
                         this.tabWidth,
                     );
 
-                    const write = await writeThemeSchema(dist, jsonData);
-
-                    log.perf(
-                        'generate',
-                        `theme saved at ${dist.slice(
-                            dist.lastIndexOf('themes'),
-                        )} in`,
-                        perf.runtime(metricts.now),
+                    const write = await themeFiles.writeFile(
+                        dist,
+                        this.themeData,
                     );
 
                     return callback(write);
@@ -201,15 +64,46 @@ class Transpiler {
         return;
     }
 
+    /**
+     * Listen for changes in the theme `*.yml` file and generates the `*-color-theme.json` file automatically.
+     *
+     * @param {object} options The theme metadata such as `dist` and `src` path locations.
+     * @param {function} callback The function called either when an error occurs or when execution finished successfully.
+     */
     listen(options, callback) {
         const { src } = { ...options };
 
-        watchThemeChanges(src, () => {
+        themeFiles.watchFileChanges(src, () => {
             log.listen(options);
-            options.metricts.start = perf.mark();
-            this.generate(options, (v) => callback(v));
+            this.generate(options, (err) => callback(err));
         });
     }
 }
 
-module.exports = { Transpiler };
+const transpiler = new Transpiler();
+
+/**
+ * Get the data from theme `*.yml` file and convert the Yaml data to JSON with the custom `js-yaml` type.
+ *
+ * @param {string} src The full path to theme schema file. The file should be an valid Yaml file.
+ */
+async function getThemeSchema(src) {
+    try {
+        const yamlData = await themeFiles.readFile(src);
+
+        /**
+         * Parses Yaml data into either a plain object, a string, a number, null or
+         * undefined, or throws YAMLException on error.
+         */
+        const jsonData = await jsYaml.load(yamlData, {
+            schema: cast.getCastSchema(),
+            json: true,
+        });
+
+        return jsonData;
+    } catch (err) {
+        return Promise.reject(err);
+    }
+}
+
+module.exports = transpiler;
