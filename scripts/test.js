@@ -4,39 +4,63 @@
 
 'strict';
 
-const { cbulk } = require('./utils/ConsoleUtils');
-const perf = require('./utils/Metricts');
+const lint = require('./lib/lint');
+const { cbulk, print, log } = require('./lib/console');
+const { themeFiles, metadata } = require('./lib/snippet');
 
-const {
-    ColorThemeReference,
-    TestColorThemes,
-} = require('./utils/ThemeTestUtils');
+async function initialize(packageInfo) {
+    try {
+        const themesList = await themeFiles.getThemesList();
 
-const colorThemeReference = new ColorThemeReference();
+        for (const themePath of Object.values(themesList)) {
+            log.test.init(themePath.slice(themePath.lastIndexOf('themes')));
 
-/**
- * Get color theme references from 'themes/schemas/colors.json' in the root folder
- * or from 'https://code.visualstudio.com/api/references/theme-color'
- * @param {boolean} latest Update theme references or use cache
- *
- * Note:
- * Only set { latest: false } to true if cached data is outdated otherwise keep it false.
- */
-colorThemeReference.get({ latest: false }).then((data) => {
-    console.log(`${cbulk.green('Test initialized...\n')}`);
+            const fileData = await themeFiles.readFile(themePath);
+            const themeData = await JSON.parse(fileData);
 
-    const colorsReference = data.colors;
-    const colorsAvailable = data.colors.length;
+            const tests = lint.getListOfTest();
 
-    const testColorThemes = new TestColorThemes({
-        colors: colorsReference,
-        count: colorsAvailable,
-        metricts: {
-            start: perf.mark(),
-            now: perf.mark(),
-        },
+            let errors = [];
+
+            for (const value of Object.values(tests)) {
+                print(`\n${cbulk.gray(`[test] ${value.message}... `)}`);
+
+                const testOutput = await lint.test(
+                    value.id,
+                    themePath,
+                    themeData,
+                    packageInfo,
+                );
+
+                if (testOutput) {
+                    print(`${cbulk.red('FAIL')}`);
+                    print(`\n${testOutput.message}`);
+                    errors.push(testOutput);
+                } else {
+                    print(`${cbulk.green('PASS')}`);
+                }
+            }
+
+            if (Object.values(errors).length == 0) {
+                log.test.finished();
+            } else {
+                print(`\n${cbulk.red('\nFailed.\n')}\n`);
+            }
+        }
+    } catch (err) {
+        if (err && err.message) {
+            console.log(err);
+        }
+        process.exit(1);
+    }
+}
+
+metadata
+    .getPackageInfo(process.env.npm_package_json)
+    .then((packageInfo) => initialize(packageInfo))
+    .catch((err) => {
+        if (err && err.message) {
+            console.log(err);
+        }
+        process.exit(1);
     });
-
-    // Test the colors tokens of all color-theme inside 'themes/' directory.
-    testColorThemes.initialize();
-});
