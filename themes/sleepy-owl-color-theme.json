@@ -1,9 +1,0 @@
-{
-  "type": "dark",
-  "colors": {
-    "editor.background": "#1e1e1e",
-    "editorIndentGuide.background": "#404040",
-    "editorRuler.foreground": "#333333",
-    "activityBarBadge.background": "#007acc"
-  }
-}
