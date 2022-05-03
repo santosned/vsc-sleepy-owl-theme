@@ -74,7 +74,7 @@ class Transpiler {
         const { src } = { ...options };
 
         themeFiles.watchFileChanges(src, () => {
-            log.listen(options);
+            log.listen.init(options);
             this.generate(options, (err) => callback(err));
         });
     }
