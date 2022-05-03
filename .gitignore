@@ -3,17 +3,18 @@ logs
 *.log
 npm-debug.log*
 
+# Cache of theme references (https://code.visualstudio.com/api/references/theme-color)
+references-[aA-zZ]*.cache.json
+
 # Diagnostic reports (https://nodejs.org/api/report.html)
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 
-# Output of 'vsce publish
-build/Release
+# Exclude releases and the output of 'vsce package'
+themes/release
+*.vsix
 
 # Dependency directories
 node_modules/
-
-# Output of 'vsce package'
-*.vsix
 
 # dotenv environment variables file
 .env
