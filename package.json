@@ -1,22 +1,22 @@
 {
 	"name": "theme-sleepy-owl",
-	"displayName": "Sleepy Owl",
-	"description": "A dark theme for vscode.",
+	"displayName": "Sleepy Owl (Beta)",
+	"description": "Collection of dark themes for over-night hours of coding.",
 	"version": "1.0.0",
 	"publisher": "santosned",
 	"scripts": {
 		"build": "node ./scripts/build.js",
 		"start": "node ./scripts/start.js",
 		"test": "node ./scripts/test.js",
-		"package": "vsce package -o ./build/Release/sleepy-owl.vsix",
+		"package": "node ./scripts/package.js && vsce package -o ./themes/release/sleepy-owl.vsix",
 		"publish": "vsce publish"
 	},
 	"contributes": {
 		"themes": [
 			{
-				"label": "Sleepy Owl",
+				"label": "Sleepy Owl - Raisin Default (Beta)",
 				"uiTheme": "vs-dark",
-				"path": "./themes/sleepy-owl-color-theme.json"
+				"path": "./themes/sleepy-owl-raisin-default-color-theme.json"
 			}
 		]
 	},
@@ -41,7 +41,7 @@
 	"galleryBanner": {
 		"theme": "dark"
 	},
-	"icon": "icon.png",
+	"icon": "assets/icon.png",
 	"license": "MIT",
 	"categories": [
 		"Themes"
