@@ -1,8 +1,8 @@
 {
 	"name": "theme-sleepy-owl",
 	"displayName": "Sleepy Owl (Beta)",
-	"description": "Collection of dark themes for over-night hours of coding.",
-	"version": "1.0.0",
+	"description": "Collection of dark themes for coding overnight.",
+	"version": "0.65.0",
 	"publisher": "santosned",
 	"scripts": {
 		"build": "node ./scripts/build.js",
@@ -14,9 +14,24 @@
 	"contributes": {
 		"themes": [
 			{
-				"label": "Sleepy Owl - Raisin Default (Beta)",
+				"label": "Sleepy Owl - Cadet Default (Beta)",
 				"uiTheme": "vs-dark",
-				"path": "./themes/sleepy-owl-raisin-default-color-theme.json"
+				"path": "./themes/sleepy-owl-cadet-default-color-theme.json"
+			},
+			{
+				"label": "Sleepy Owl - Mint (Beta)",
+				"uiTheme": "vs-dark",
+				"path": "./themes/sleepy-owl-mint-color-theme.json"
+			},
+			{
+				"label": "Sleepy Owl - Wine (Beta)",
+				"uiTheme": "vs-dark",
+				"path": "./themes/sleepy-owl-wine-color-theme.json"
+			},
+			{
+				"label": "Sleepy Owl - Onyx (Beta)",
+				"uiTheme": "vs-dark",
+				"path": "./themes/sleepy-owl-onyx-color-theme.json"
 			}
 		]
 	},
