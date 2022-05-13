@@ -20,5 +20,5 @@ node_modules/
 .env
 .env.test
 
-# Generate output
-dist
+# Exclude theme dist files
+*color-theme.json
