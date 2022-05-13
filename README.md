@@ -19,7 +19,7 @@ There's many ways to contribute in this project:
 -   [Report bugs](https://github.com/santosned/vsc-sleepy-owl-theme/issue), and help us verify as they are checked in.
 -   Review themes nor source code changes.
 -   Review the documentation, and make pull requests for typos and other needed changes.
--   To contribute with theme development see more in [CONTRIBUTING](https://github.com/santosned/vsc-sleepy-owl-theme/CONTRIBUTING.md).
+-   To contribute with theme development see more in [CONTRIBUTING](https://github.com/santosned/vsc-sleepy-owl-theme/blob/main/CONTRIBUTING.md).
 
 ## License
 
