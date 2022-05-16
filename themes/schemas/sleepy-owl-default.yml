@@ -40,7 +40,7 @@ base:
     - !cast &foregroundDarker { color: *BrightBlack, light: -4 }
     - !cast &foregroundUnfocused { color: *foreground, light: -45 }
 
-    # Background alternatives 
+    # Background alternatives
     - !cast &backgroundLight { color: *background, light: 2 }
     - !cast &backgroundLighter { color: *background, light: 8 }
     - !cast &backgroundDarker { color: *background, light: -4 }
@@ -1944,3 +1944,27 @@ tokenColors:
       - source.swift meta.import entity.name.type
     settings:
       foreground: *foreground
+
+  # * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+  # - Coffee script
+  # * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+  - name: Coffee (Variable call)
+    scope:
+      - source.coffee variable.other.object.coffee
+      - source.coffee variable.other.object.property.coffee
+      - source.coffee support.class.coffee
+      - entity.name.type.object.coffee
+    settings:
+      foreground: *Cyan
+
+  - name: Coffee (Special Keyword Call)
+    scope:
+      - source.coffee variable.other.readwrite.instance.coffee
+    settings:
+      foreground: *Purple
+
+  - name: Coffee (Object Call)
+    scope:
+      - meta.class.instance.constructor.coffee entity.name.type.instance.coffee
+    settings:
+      foreground: *Green
