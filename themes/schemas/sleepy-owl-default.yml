@@ -1000,7 +1000,7 @@ tokenColors:
       - entity.name.operator
       - keyword.import
     settings:
-      foreground: *Blue
+      foreground: *Purple
 
   - name: Keyword (Type Assign)
     scope:
@@ -1836,7 +1836,7 @@ tokenColors:
     scope:
       - source.rust keyword.other
     settings:
-      foreground: *Blue
+      foreground: *Purple
 
   - name: Rust (Keyword Operator Access)
     scope:
