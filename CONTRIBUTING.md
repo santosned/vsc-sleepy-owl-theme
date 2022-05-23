@@ -64,13 +64,13 @@ Do you want to develop an theme alternative? with a different background accent 
 
 1. Clone and open this [repo](https://github.com/santosned/vsc-sleepy-owl-theme) in VS Code.
 2. Run `npm install` to install all dependencies.
-3. Open `package.json` and select the theme you want as the `target-for-dev`. In the code bellow the theme `Sleepy Owl - Cadet Default` is the first objet inside `themes: [...]` making it the default theme target for development:
+3. Open `package.json` and select the theme you want as the `target-for-dev`. In the code bellow the theme `Sleepy Owl - Default` is the first objet inside `themes: [...]` making it the default theme target for development:
 
     ```jsonc
     "contributes": {
         "themes": [
             {
-    			"label": "Sleepy Owl - Default (Beta)",
+    			"label": "Sleepy Owl - Default",
     			"uiTheme": "vs-dark",
     			"path": "./themes/sleepy-owl-default-color-theme.json"
     		},
