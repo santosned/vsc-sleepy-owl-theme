@@ -58,9 +58,7 @@ class Transpiler {
                     return callback(err);
                 }
             })
-            .catch((err) => {
-                return callback(err);
-            });
+            .catch((err) => callback(err));
         return;
     }
 
