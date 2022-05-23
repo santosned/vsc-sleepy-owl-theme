@@ -63,17 +63,17 @@ Please include the following information with each issue:
 Do you want to develop an theme alternative? with a different background accent color that you like? or bring support to another language? No problem, it's an simple and straigthfoward process as explained bellow:
 
 1. Clone and open this [repo](https://github.com/santosned/vsc-sleepy-owl-theme) in VS Code.
-2. Run `npm` to install all dependencies.
+2. Run `npm install` to install all dependencies.
 3. Open `package.json` and select the theme you want as the `target-for-dev`. In the code bellow the theme `Sleepy Owl - Cadet Default` is the first objet inside `themes: [...]` making it the default theme target for development:
 
-    ```json
+    ```jsonc
     "contributes": {
         "themes": [
             {
-                "label": "Sleepy Owl - Cadet Default (Beta)",
-                "uiTheme": "vs-dark",
-                "path": "./themes/sleepy-owl-cadet-default-color-theme.json"
-            },
+    			"label": "Sleepy Owl - Default (Beta)",
+    			"uiTheme": "vs-dark",
+    			"path": "./themes/sleepy-owl-default-color-theme.json"
+    		},
             // Other themes metadata...
         ]
     },
@@ -99,7 +99,7 @@ or if you **don't** want to reload the window or run a command **every** time yo
 npm run start
 ```
 
-When developing themes only set new colors at the base color palette in the top of the .yml file, or use !cast to tweak an existent color.
+When developing themes only set new colors at the base color palette in the top of your theme .yml file, or use !cast to tweak an existent color.
 
 ### Tweak Color Lightness
 
@@ -125,7 +125,7 @@ The `alpha: 90` will override the opacity of `rgb(121, 160, 232)` to 90% resulti
 
 > Notice: To make sure the themes follows an standard and mitigate possible common mistakes testing the themes is a must as mentioned bellow.
 
-After finishing the development of an theme or to identify possible mistakes the test script was created, it will verify if the name of the theme matches, if its values and tokens are valid, and more.
+After finishing the development of an theme and identify possible mistakes, the test script was created to verify if the name of the theme matches, if its values and tokens are valid, and more.
 
 To test, run the following script:
 
@@ -135,8 +135,10 @@ npm test
 
 ### Build Extension
 
-After finishing updating the theme and testing it you can build it and test your changes before releasing.
+After finishing updating the theme and debugging it you can package the theme and do the final test.
 
 ```sh
 npm run package
 ```
+
+This will generate a `sleepy-owl.vsix` file inside `themes/release` which you can right-click on it while in VS Code and then click in install to test your changes before releasing it.
