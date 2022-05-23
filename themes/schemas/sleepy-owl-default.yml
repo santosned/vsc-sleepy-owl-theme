@@ -4,7 +4,7 @@
 name: Sleepy Owl - Default (Beta)
 author: santosned
 type: dark
-version: 0.76.0
+version: 0.80.0
 status: beta
 
 #########################################################################
@@ -32,9 +32,9 @@ base:
   vscode:
     # Editor
     - !cast &foreground { color: *White, light: -25 }
-    - !cast &background { color: 'rgb(32, 32, 42)' }
+    - !cast &background { color: 'rgb(36, 36, 47)' }
     - !cast &cursorColor { color: *Blue, light: 18, alpha: 98 }
-    - !cast &selectionBackground { color: 'rgb(64, 64, 78)' }
+    - !cast &selectionBackground { color: *background, light: 32 }
 
     # Foreground alternatives
     - !cast &foregroundDarker { color: *BrightBlack, light: -4 }
@@ -43,12 +43,13 @@ base:
     # Background alternatives
     - !cast &backgroundLight { color: *background, light: 2 }
     - !cast &backgroundLighter { color: *background, light: 8 }
-    - !cast &backgroundDarker { color: *background, light: -4 }
+    - !cast &backgroundDark { color: *background, light: -4 }
+    - !cast &backgroundDarker { color: *background, light: -8 }
     - !cast &backgroundDragNDrop { color: *selectionBackground, alpha: 75 }
 
     # List Items
-    - !cast &listItemSelected { color: 'rgb(64, 64, 80)', alpha: 45 }
-    - !cast &listItemHover { color: 'rgb(64, 64, 80)', alpha: 18 }
+    - !cast &listItemSelected { color: 'rgb(66, 66, 80)', alpha: 45 }
+    - !cast &listItemHover { color: 'rgb(66, 66, 80)', alpha: 18 }
 
     # Statusbar
     - !cast &statusbarBackground { color: *backgroundDarker, light: -6 }
@@ -61,12 +62,11 @@ base:
         light: 8,
       }
 
+    # ActivityBar
+    - !cast &activityBarBackground { color: *background, light: 12 }
+
     # Quick input
-    - !cast &quickInputBackground {
-        color: *backgroundLighter,
-        light: -4,
-        alpha: 99,
-      }
+    - !cast &quickInputBackground { color: *background, light: 4, alpha: 99 }
 
     # Active colors for active border and other elements
     - !cast &activeColor { color: *BrightBlue, light: -24 }
@@ -81,7 +81,7 @@ base:
     - !cast &link { color: *activeColor, light: -3 }
 
     # Color for selected text in input, menu, and other areas.
-    - !cast &textSelection { color: *activeColor, light: -43, alpha: 75 }
+    - !cast &textSelection { color: *activeColor, light: -43, alpha: 56 }
 
     # Color for scrollbar shadows and more.
     - !cast &shadow { color: *Black, alpha: 16 }
@@ -96,6 +96,7 @@ base:
     - !cast &successBackground { color: *Green, light: -35 }
     - !cast &errorForeground { color: *Red, light: -25 }
     - !cast &errorBackground { color: *Red, light: -35 }
+
 #########################################################################
 # - VScode editor tokens
 # The color in the editor tokens should use the base color palette.
@@ -250,7 +251,7 @@ colors:
   ###############################
   # - Activity Bar
   # The Activity Bar is displayed either on the far left or right of the workbench and allows fast switching between views of the Side Bar.
-  activityBar.background: *backgroundDarker # Activity Bar background color.
+  activityBar.background: *activityBarBackground # Activity Bar background color.
   activityBar.dropBorder: *selectionBackground # Drag and drop feedback color for the activity bar items. The activity bar is showing on the far left or right and allows to switch between views of the side bar.
   activityBar.foreground: *foreground # Activity Bar foreground color (for example used for the icons).
   activityBar.inactiveForeground: !cast { color: *BrightBlack, light: -4 } # Activity Bar item foreground color when it is inactive.
@@ -313,7 +314,7 @@ colors:
   tab.border: *border # Border to separate Tabs from each other.
   tab.activeBorder: *background # Bottom border for the active tab.
   tab.unfocusedActiveBorder: *background # Bottom border for the active tab in an inactive editor group.
-  tab.activeBorderTop: *background # Top border for the active tab.
+  tab.activeBorderTop: *activeColor # Top border for the active tab.
   tab.unfocusedActiveBorderTop: *background # Top border for the active tab in an inactive editor group
   tab.lastPinnedBorder: # Border on the right of the last pinned editor to separate from unpinned editors.
   tab.inactiveBackground: *backgroundDarker # Inactive Tab background color.
@@ -705,7 +706,7 @@ colors:
   menubar.selectionBackground: !cast { color: *selectionBackground, alpha: 40 } # Background color of the selected menu item in the menubar.
   menubar.selectionBorder: # Border color of the selected menu item in the menubar.
   menu.foreground: !cast { color: *foregroundUnfocused, light: 24 } # Foreground color of menu items.
-  menu.background: *backgroundDarker # Background color of menu items.
+  menu.background: *backgroundLight # Background color of menu items.
   menu.selectionForeground: *foreground # Foreground color of the selected menu item in menus.
   menu.selectionBackground: # Background color of the selected menu item in menus.
   menu.selectionBorder: # Border color of the selected menu item in menus.
@@ -1541,6 +1542,22 @@ tokenColors:
       fontStyle: ''
       foreground: *Yellow
 
+  - name: Python (Keyword Control)
+    scope:
+      - keyword.control.flow.python
+    settings:
+      fontStyle: ''
+      foreground: *Purple
+
+  - name: Python (Punctuaction Colon)
+    scope:
+      - punctuation.separator.colon.python
+      - punctuation.section.class.begin.python
+      - punctuation.section.function.begin.python
+    settings:
+      fontStyle: ''
+      foreground: *Purple
+
   # * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
   # - C-lang / C++
   # * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -1681,7 +1698,7 @@ tokenColors:
     scope:
       - entity.name.package.go
     settings:
-      foreground: *BrightPurple
+      foreground: *Cyan
 
   - name: Go (Keyword Package)
     scope:
@@ -1961,7 +1978,7 @@ tokenColors:
     scope:
       - source.coffee variable.other.readwrite.instance.coffee
     settings:
-      foreground: *Purple
+      foreground: *Cyan
 
   - name: Coffee (Object Call)
     scope:
