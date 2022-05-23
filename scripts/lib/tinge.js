@@ -21,7 +21,7 @@ class Tinge {
 
                 rgbValues = ch.slice(0, 6).join('');
 
-                a = Math.min(100, Math.max(0, amount));
+                a = minMax(amount, 0, 100);
                 a = rgb.percentage(a);
                 a = hex.parse(a);
                 return `#${rgbValues}${a}`;
