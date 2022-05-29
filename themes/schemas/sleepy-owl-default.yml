@@ -1376,13 +1376,20 @@ tokenColors:
       fontStyle: italic
       foreground: *Yellow
 
-  - name: CSS (Punctuation)
+  - name: CSS (Punctuation Definition)
     scope:
       - punctuation.definition.entity.css
       - punctuation.definition.entity.scss
       - punctuation.definition.entity.sass
     settings:
       foreground: *Red
+
+  - name: CSS (Punctuation Separator)
+    scope:
+      - punctuation.separator.key-value.scss
+      - punctuation.terminator.rule.scss
+    settings:
+      foreground: *BrightBlack
 
   - name: CSS (Property Name)
     scope:
