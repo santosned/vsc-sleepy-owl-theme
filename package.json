@@ -2,7 +2,7 @@
 	"name": "theme-sleepy-owl",
 	"displayName": "Sleepy Owl (Beta)",
 	"description": "Collection of dark themes for coding overnight.",
-	"version": "0.82.0",
+	"version": "0.90.0",
 	"publisher": "santosned",
 	"scripts": {
 		"build": "node ./scripts/build.js",
@@ -19,6 +19,11 @@
 				"path": "./themes/sleepy-owl-default-color-theme.json"
 			},
 			{
+				"label": "Sleepy Owl - Oak (Beta)",
+				"uiTheme": "vs-dark",
+				"path": "./themes/sleepy-owl-oak-color-theme.json"
+			},
+			{
 				"label": "Sleepy Owl - Greenwich (Beta)",
 				"uiTheme": "vs-dark",
 				"path": "./themes/sleepy-owl-greenwich-color-theme.json"
@@ -31,7 +36,7 @@
 	"contributors": [],
 	"devDependencies": {
 		"js-yaml": "^4.1.0",
-		"vsce": "^2.8.0"
+		"vsce": "^2.9.1"
 	},
 	"engines": {
 		"vscode": "^1.66.1"
