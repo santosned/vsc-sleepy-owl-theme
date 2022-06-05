@@ -1,7 +1,7 @@
 # Licensed under the MIT License.
 # See the LICENSE file in the project root for more information.
 
-name: Sleepy Owl - Greenwich (Beta)
+name: Sleepy Owl - Oak (Beta)
 author: santosned
 type: dark
 version: 0.90.0
@@ -13,7 +13,7 @@ status: beta
 #########################################################################
 base:
   ansi:
-    - !cast &BrightBlack { color: 'rgb(116, 123, 136)' }
+    - !cast &BrightBlack { color: 'rgb(120, 120, 128)' }
     - !cast &BrightBlue { color: 'rgb(150, 180, 255)' }
     - !cast &BrightCyan { color: 'rgb(100, 218, 210)' }
     - !cast &BrightGreen { color: 'rgb(174, 224, 164)' }
@@ -27,12 +27,12 @@ base:
     - !cast &Green { color: 'rgb(164, 216, 96)' }
     - !cast &Purple { color: 'rgb(164, 132, 232)' }
     - !cast &Red { color: 'rgb(232, 96, 116)' }
-    - !cast &White { color: 'rgb(224, 224, 232)' }
+    - !cast &White { color: 'rgb(225, 225, 230)' }
     - !cast &Yellow { color: 'rgb(232, 190, 86)' }
   vscode:
     # Editor
     - !cast &foreground { color: *White, light: -25 }
-    - !cast &background { color: 'rgb(36, 39, 45)' }
+    - !cast &background { color: 'rgb(41, 41, 47)' }
     - !cast &cursorColor { color: *Blue, light: 18, alpha: 98 }
     - !cast &selectionBackground { color: *background, light: 32 }
 
@@ -48,8 +48,8 @@ base:
     - !cast &backgroundDragNDrop { color: *selectionBackground, alpha: 75 }
 
     # List Items
-    - !cast &listItemSelected { color: 'rgb(66, 76, 80)', alpha: 45 }
-    - !cast &listItemHover { color: 'rgb(66, 76, 80)', alpha: 18 }
+    - !cast &listItemSelected { color: 'rgb(75, 75, 80)', alpha: 45 }
+    - !cast &listItemHover { color: 'rgb(75, 75, 80)', alpha: 18 }
 
     # Statusbar
     - !cast &statusbarBackground { color: *backgroundDarker, light: -6 }
@@ -90,7 +90,7 @@ base:
     - !cast &border { color: *backgroundDarker, light: -6 }
 
     # Color for borders/outlines of focused areas.
-    - !cast &focusColor { color: 'rgba(90, 98, 108, 0.45)' }
+    - !cast &focusColor { color: 'rgba(101, 101, 108, 0.45)' }
 
     # Color for status types such as success, warnings, error, delete or add
     - !cast &successBackground { color: *Green, light: -35 }

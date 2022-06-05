@@ -4,7 +4,7 @@
 name: Sleepy Owl - Default (Beta)
 author: santosned
 type: dark
-version: 0.82.0
+version: 0.90.0
 status: beta
 
 #########################################################################
@@ -53,7 +53,7 @@ base:
 
     # Statusbar
     - !cast &statusbarBackground { color: *backgroundDarker, light: -6 }
-    - !cast &statusbarForeground { color: *White, light: -8 }
+    - !cast &statusbarForeground { color: *White, light: -35 }
     - !cast &statusbarBackgroundDebugging { color: *Purple, light: -70 }
     - !cast &statusbarForegroundDebugging { color: *White, light: 4 }
     - !cast &statusbarBackgroundNoFolder { color: *backgroundDarker, light: -2 }
@@ -84,7 +84,7 @@ base:
     - !cast &textSelection { color: *activeColor, light: -43, alpha: 56 }
 
     # Color for scrollbar shadows and more.
-    - !cast &shadow { color: *Black, alpha: 16 }
+    - !cast &shadow { color: *Black, alpha: 45 }
 
     # Color for borders to separate multiple areas and elements.
     - !cast &border { color: *backgroundDarker, light: -6 }
@@ -508,13 +508,30 @@ colors:
   editorOverviewRuler.selectionHighlightForeground: # Overview ruler marker color for selection highlights. The color must not be opaque so as not to hide underlying decorations.
   editorOverviewRuler.wordHighlightForeground: # Overview ruler marker color for symbol highlights. The color must not be opaque so as not to hide underlying decorations.
   editorOverviewRuler.wordHighlightStrongForeground: # Overview ruler marker color for write-access symbol highlights. The color must not be opaque so as not to hide underlying decorations.
-  editorOverviewRuler.modifiedForeground: !cast { color: *Yellow, light: 25 } # Overview ruler marker color for modified content.
-  editorOverviewRuler.addedForeground: !cast { color: *Green, light: 25 } # Overview ruler marker color for added content.
-  editorOverviewRuler.deletedForeground: !cast { color: *Red, light: 25 } # Overview ruler marker color for deleted content.
-  editorOverviewRuler.errorForeground: !cast { color: *Red, light: -5 } # Overview ruler marker color for errors.
+  editorOverviewRuler.modifiedForeground: !cast {
+      color: *Yellow,
+      light: 25,
+      alpha: 75,
+    } # Overview ruler marker color for modified content.
+  editorOverviewRuler.addedForeground: !cast {
+      color: *Green,
+      light: 25,
+      alpha: 75,
+    } # Overview ruler marker color for added content.
+  editorOverviewRuler.deletedForeground: !cast {
+      color: *Red,
+      light: 25,
+      alpha: 75,
+    } # Overview ruler marker color for deleted content.
+  editorOverviewRuler.errorForeground: !cast {
+      color: *Red,
+      light: -5,
+      alpha: 75,
+    } # Overview ruler marker color for errors.
   editorOverviewRuler.warningForeground: !cast {
       color: *BrightYellow,
       light: -5,
+      alpha: 75,
     } # Overview ruler marker color for warnings.
   editorOverviewRuler.infoForeground: # Overview ruler marker color for infos.
   editorOverviewRuler.bracketMatchForeground: # Overview ruler marker color for matching brackets.
@@ -679,12 +696,12 @@ colors:
       color: *selectionBackground,
       alpha: 85,
     } # Status Bar prominent items background color when hovering.
-  statusBarItem.remoteBackground: # Background color for the remote indicator on the status bar.
-  statusBarItem.remoteForeground: # Foreground color for the remote indicator on the status bar.
-  statusBarItem.errorBackground: # Status bar error items background color. Error items stand out from other status bar entries to indicate error conditions.
-  statusBarItem.errorForeground: # Status bar error items foreground color. Error items stand out from other status bar entries to indicate error conditions.
-  statusBarItem.warningBackground: # Status bar warning items background color. Warning items stand out from other status bar entries to indicate warning conditions. The status bar is shown in the bottom of the window.
-  statusBarItem.warningForeground: # Status bar warning items foreground color. Warning items stand out from other status bar entries to indicate warning conditions. The status bar is shown in the bottom of the window.
+  statusBarItem.remoteBackground: *statusbarBackground # Background color for the remote indicator on the status bar.
+  statusBarItem.remoteForeground: *Green # Foreground color for the remote indicator on the status bar.
+  statusBarItem.errorBackground: *statusbarBackground # Status bar error items background color. Error items stand out from other status bar entries to indicate error conditions.
+  statusBarItem.errorForeground: *Red # Status bar error items foreground color. Error items stand out from other status bar entries to indicate error conditions.
+  statusBarItem.warningBackground: *statusbarBackground # Status bar warning items background color. Warning items stand out from other status bar entries to indicate warning conditions. The status bar is shown in the bottom of the window.
+  statusBarItem.warningForeground: *Yellow # Status bar warning items foreground color. Warning items stand out from other status bar entries to indicate warning conditions. The status bar is shown in the bottom of the window.
   statusBarItem.compactHoverBackground: !cast {
       color: *selectionBackground,
       alpha: 55,
@@ -858,21 +875,50 @@ colors:
 
   ###############################
   # - Git colors
-  gitDecoration.addedResourceForeground: !cast { color: *Green, light: 25 } # Color for added Git resources. Used for file labels and the SCM viewlet.
-  gitDecoration.modifiedResourceForeground: !cast { color: *Yellow, light: 25 } # Color for modified Git resources. Used for file labels and the SCM viewlet.
-  gitDecoration.deletedResourceForeground: !cast { color: *Red, light: 25 } # Color for deleted Git resources. Used for file labels and the SCM viewlet.
-  gitDecoration.renamedResourceForeground: !cast { color: *Red, light: 25 } # Color for renamed or copied Git resources. Used for file labels and the SCM viewlet.
+  gitDecoration.addedResourceForeground: !cast {
+      color: *Green,
+      light: 25,
+      alpha: 75,
+    } # Color for added Git resources. Used for file labels and the SCM viewlet.
+  gitDecoration.modifiedResourceForeground: !cast {
+      color: *Yellow,
+      light: 25,
+      alpha: 75,
+    } # Color for modified Git resources. Used for file labels and the SCM viewlet.
+  gitDecoration.deletedResourceForeground: !cast {
+      color: *Red,
+      light: 25,
+      alpha: 75,
+    } # Color for deleted Git resources. Used for file labels and the SCM viewlet.
+  gitDecoration.renamedResourceForeground: !cast {
+      color: *Red,
+      light: 25,
+      alpha: 75,
+    } # Color for renamed or copied Git resources. Used for file labels and the SCM viewlet.
   gitDecoration.stageModifiedResourceForeground: !cast {
       color: *Yellow,
       light: 25,
+      alpha: 75,
     } # Color for staged modifications git decorations. Used for file labels and the SCM viewlet.
-  gitDecoration.stageDeletedResourceForeground: !cast { color: *Red, light: 25 } # Color for staged deletions git decorations. Used for file labels and the SCM viewlet.
-  gitDecoration.untrackedResourceForeground: !cast { color: *Green, light: 25 } # Color for untracked Git resources. Used for file labels and the SCM viewlet.
+  gitDecoration.stageDeletedResourceForeground: !cast {
+      color: *Red,
+      light: 25,
+      alpha: 75,
+    } # Color for staged deletions git decorations. Used for file labels and the SCM viewlet.
+  gitDecoration.untrackedResourceForeground: !cast {
+      color: *Green,
+      light: 25,
+      alpha: 75,
+    } # Color for untracked Git resources. Used for file labels and the SCM viewlet.
   gitDecoration.ignoredResourceForeground: !cast {
       color: *BrightBlack,
       alpha: 75,
     } # Color for ignored Git resources. Used for file labels and the SCM viewlet.
-  gitDecoration.conflictingResourceForeground: !cast { color: *Red, light: 25 } # Color for conflicting Git resources. Used for file labels and the SCM viewlet.
+  gitDecoration.conflictingResourceForeground: !cast {
+      color: *Red,
+      light: 25,
+      alpha: 75,
+    } # Color for conflicting Git resources. Used for file labels and the SCM viewlet.
   gitDecoration.submoduleResourceForeground: # Color for submodule resources.
 
   ###############################
@@ -904,9 +950,9 @@ colors:
   # - Breadcrumbs colors
   # The theme colors for breadcrumbs navigation:
 
-  breadcrumb.foreground: # Color of breadcrumb items.
+  breadcrumb.foreground: *foregroundDarker # Color of breadcrumb items.
   breadcrumb.background: # Background color of breadcrumb items.
-  breadcrumb.focusForeground: # Color of focused breadcrumb items.
+  breadcrumb.focusForeground: *foregroundUnfocused # Color of focused breadcrumb items.
   breadcrumb.activeSelectionForeground: # Color of selected breadcrumb items.
   breadcrumbPicker.background: # Background color of breadcrumb item picker.
 
@@ -1197,11 +1243,23 @@ tokenColors:
     scope:
       - punctuation.accessor
       - meta.brace.round
-      - punctuation.definition.block
-      - punctuation.definition.parameters
+      - punctuation.definition
       - punctuation.terminator.statement
+      - keyword.operator.type.annotation
+      - meta.array.literal meta.brace.square
+      - punctuation.separator.dictionary.pair
+      - meta.property-value punctuation.section.function
+      - punctuation.section.property-list.begin.bracket.curly
+      - punctuation.section.property-list.end.bracket.curly
+      - punctuation.section.keyframes.begin
+      - punctuation.section.keyframes.end
+      - meta.brace.curly
+      - punctuation.brackets.curly
+      - punctuation.brackets.round
+      - punctuation.comma
+      - punctuation.separator
     settings:
-      foreground: *foreground
+      foreground: *BrightBlack
 
   - name: Punctuation (Special Words)
     scope:
@@ -1209,12 +1267,12 @@ tokenColors:
     settings:
       foreground: *Purple
 
-  - name: Punctuation (Tag)
+  - name: Punctuation (Special Functions)
     scope:
-      - punctuation.definition.tag.begin
-      - punctuation.definition.tag.end
+      - punctuation.section.embedded.begin
+      - punctuation.section.embedded.end
     settings:
-      foreground: *Purple
+      foreground: *Yellow
 
   # * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
   # - Regex
@@ -1244,11 +1302,6 @@ tokenColors:
     scope: punctuation.separator.key-value.html
     settings:
       foreground: *Red
-
-  - name: XML (Definition Tag)
-    scope: punctuation.definition.tag.xml
-    settings:
-      foreground: *Purple
 
   # * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
   # - JSON
@@ -1336,6 +1389,13 @@ tokenColors:
     settings:
       foreground: *BrightYellow
 
+  - name: Javascript (Module Name)
+    scope:
+      - source.jsx entity.name.tag support.class.component
+      - source.js entity.name.tag support.class.component
+    settings:
+      foreground: *BrightGreen
+
   # * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
   # - Typescript
   # * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -1359,6 +1419,12 @@ tokenColors:
       - meta.block variable.other.object.tsx
     settings:
       foreground: *Cyan
+
+  - name: Typescript (Module Name)
+    scope:
+      - source.tsx entity.name.tag support.class.component
+    settings:
+      foreground: *BrightGreen
 
   # * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
   # - SASS / CSS
@@ -1526,9 +1592,11 @@ tokenColors:
       - punctuation.definition.arguments.end.python
       - punctuation.separator.arguments.python
       - punctuation.separator.period.python
+      - punctuation.parenthesis.begin.python
+      - punctuation.parenthesis.end.python
     settings:
       fontStyle: ''
-      foreground: *foreground
+      foreground: *BrightBlack
 
   - name: Python (Function Call Arguments)
     scope:
@@ -1667,9 +1735,22 @@ tokenColors:
 
   - name: Java (Punctuation)
     scope:
+      - punctuation.bracket.round.java
       - punctuation.bracket.square.java
+      - punctuation.terminator.java
+      - punctuation.separator.period.java
+      - punctuation.section.catch.begin.bracket.curly.java
+      - punctuation.section.catch.end.bracket.curly.java
+      - punctuation.section.block.begin.bracket.curly.java
+      - punctuation.section.block.end.bracket.curly.java
+      - punctuation.section.try.begin.bracket.curly.java
+      - punctuation.section.try.end.bracket.curly.java
+      - punctuation.section.method.begin.bracket.curly.java
+      - punctuation.section.method.end.bracket.curly.java
+      - punctuation.section.class.begin.bracket.curly.java
+      - punctuation.section.class.end.bracket.curly.java
     settings:
-      foreground: *foreground
+      foreground: *BrightBlack
 
   - name: Java (Type)
     scope:
@@ -1694,6 +1775,15 @@ tokenColors:
     settings:
       fontStyle: italic
       foreground: *Purple
+
+  - name: Go (Punctuation)
+    scope:
+      - punctuation.definition.imports.begin.bracket.round.go
+      - punctuation.definition.imports.end.bracket.round.go
+      - source.go punctuation.definition
+      - source.go punctuation.other
+    settings:
+      foreground: *BrightBlack
 
   - name: Go (Name Package)
     scope:
@@ -1812,11 +1902,14 @@ tokenColors:
     settings:
       foreground: *BrightYellow
 
-  - name: Rust (Method Key Assign)
+  - name: Rust (Punctuation)
     scope:
       - source.rust keyword.operator.key-value
+      - source.rust punctuation.brackets.angle
+      - source.rust keyword.operator.access.dot
+      - source.rust punctuation.semi
     settings:
-      foreground: *foreground
+      foreground: *BrightBlack
 
   - name: Rust (Attribute Definition)
     scope:
@@ -1855,12 +1948,6 @@ tokenColors:
       - source.rust keyword.other
     settings:
       foreground: *Purple
-
-  - name: Rust (Keyword Operator Access)
-    scope:
-      - source.rust keyword.operator.access.dot
-    settings:
-      foreground: *foreground
 
   - name: Rust (Storage Modifier)
     scope:
