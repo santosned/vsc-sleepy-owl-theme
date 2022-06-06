@@ -34,32 +34,24 @@ class Transpiler {
      * Generate the `*-color-theme.json` file inside `/themes` folder based on the theme schema inside `/themes/schemas` folder.
      *
      * @param {object} options The theme metadata such as `dist` and `src` path locations.
-     * @param {function} callback The function called either when an error occurs or when execution finished successfully.
      */
-    generate(options, callback) {
+    async generate(options) {
         const { dist, src } = { ...options };
 
-        getThemeSchema(src)
-            .then(async (jsonData) => {
-                try {
-                    this.themeData = JSON.stringify(
-                        jsonData,
-                        this.replacer,
-                        this.tabWidth,
-                    );
+        try {
+            const jsonData = await getThemeSchema(src);
+            const themeData = JSON.stringify(
+                jsonData,
+                this.replacer,
+                this.tabWidth,
+            );
 
-                    const write = await themeFiles.writeFile(
-                        dist,
-                        this.themeData,
-                    );
+            const write = await themeFiles.writeFile(dist, themeData);
 
-                    return callback(write);
-                } catch (err) {
-                    return callback(err);
-                }
-            })
-            .catch((err) => callback(err));
-        return;
+            return Promise.resolve(write);
+        } catch (err) {
+            return Promise.reject(err);
+        }
     }
 
     /**
@@ -73,7 +65,9 @@ class Transpiler {
 
         themeFiles.watchFileChanges(src, () => {
             log.listen.init(options);
-            this.generate(options, (err) => callback(err));
+            this.generate(options)
+                .then(() => callback())
+                .catch((err) => callback(err));
         });
     }
 }
