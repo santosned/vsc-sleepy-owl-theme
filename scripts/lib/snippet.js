@@ -46,24 +46,33 @@ const metadata = {
      * Get theme info, such as theme `dist`, and `src` path.
      *
      * @param {string} url Full path to the package.json file.
+     * @returns {object} List with theme files informations
      */
     getThemeInfo: async (url) => {
         try {
             const fileData = await fsPromises.readFile(url, 'utf-8');
             const data = await JSON.parse(fileData);
-            const { label, uiTheme, path } = { ...data.contributes.themes[0] };
-            const themeInfo = {
-                name: label,
-                type: uiTheme,
-                dist: getPath.themesFolder(
-                    `${path.slice(path.lastIndexOf('/'))}`,
-                ),
-                src: getPath.schemasFolder(
-                    `${path
-                        .slice(path.lastIndexOf('/'))
-                        .replace('-color-theme.json', '.yml')}`,
-                ),
-            };
+
+            const themeInfo = data.contributes.themes.map((v, i) => {
+                const { label, uiTheme, path } = { ...v };
+                return {
+                    name: label,
+                    type: uiTheme,
+                    dist: getPath.themesFolder(
+                        `${path.slice(path.lastIndexOf('/'))}`,
+                    ),
+                    src: getPath.schemasFolder(
+                        `${path
+                            .slice(path.lastIndexOf('/'))
+                            .replace('-color-theme.json', '.yml')}`,
+                    ),
+                };
+            });
+
+            if (typeof themeInfo !== 'object') {
+                throw 'Failed to get theme information';
+            }
+
             return themeInfo;
         } catch (err) {
             return Promise.reject(err);
@@ -182,7 +191,10 @@ const themeFiles = {
 
 const references = {
     colors: {
-        path: join(__dirname, '../../themes/schemas/references-colors.cache.json'),
+        path: join(
+            __dirname,
+            '../../themes/schemas/references-colors.cache.json',
+        ),
         api: {
             url: 'https://code.visualstudio.com/api/references/theme-color',
             request: async () => {
