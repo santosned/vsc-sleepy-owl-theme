@@ -2,7 +2,7 @@
 	"name": "theme-sleepy-owl",
 	"displayName": "Sleepy Owl (Beta)",
 	"description": "Collection of dark themes for coding overnight.",
-	"version": "0.90.0",
+	"version": "0.90.1",
 	"publisher": "santosned",
 	"scripts": {
 		"build": "node ./scripts/build.js",
@@ -49,6 +49,7 @@
 		"url": "https://github.com/santosned/vsc-sleepy-owl-theme/issues"
 	},
 	"galleryBanner": {
+		"color": "#24242F",
 		"theme": "dark"
 	},
 	"icon": "assets/icon.png",
