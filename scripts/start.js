@@ -11,18 +11,16 @@ const { metadata } = require('./lib/snippet');
 metadata
     .getThemeInfo(process.env.npm_package_json)
     .then((themeInfo) => {
-        transpiler.listen(themeInfo, (err) => {
+        transpiler.listen(themeInfo[0], (err) => {
             if (err) {
                 // Log the error message if any
-                if (err.message) console.log(err.message);
+                if (err.message) console.log(err);
 
                 // Uncomment the next line if the listener should stop after receiving a error message
                 //process.exit(1);
             }
 
-            if (err === undefined) {
-                log.listen.ready();
-            }
+            if (err === undefined) log.listen.ready();
         });
     })
     .catch((err) => {
