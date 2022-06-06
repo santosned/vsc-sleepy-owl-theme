@@ -75,11 +75,18 @@ const log = {
         },
     },
     build: {
-        init: (args) => {
+        init: (label) => {
+            performance.mark(`build-${label}`);
+        },
+        ready: (args) => {
             const { src, dist } = getPath.strip.resourcesFolder(
                 args.src,
                 args.dist,
             );
+            const label = `build-${args.name}`;
+            performance.mark(label);
+            let runtime = performance.measure(label);
+            runtime = parseInt(runtime.duration);
             print(
                 `${cbulk.cyan(args.name)} ${cbulk.green(
                     'theme build at:',
@@ -87,19 +94,7 @@ const log = {
             );
             print(`   ${cbulk.white('> Build:')}    ${cbulk.cyan(dist)}\n`);
             print(`   ${cbulk.white('> Source:')}   ${cbulk.cyan(src)}\n`);
-            performance.mark('build-start');
-        },
-        ready: () => {
-            performance.mark('build-end');
-            let runtime = performance.measure(
-                'build-runtime',
-                'build-start',
-                'build-end',
-            );
-            runtime = parseInt(runtime.duration);
             print(`\n${cbulk.green(`Ready in ${runtime}ms`)}\n\n`);
-            performance.clearMarks();
-            performance.clearMeasures();
         },
     },
     error: (tag, msg) => {
